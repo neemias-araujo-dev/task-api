@@ -14,6 +14,22 @@ export function TaskManager({
   initialTasks,
 }: TaskManagerProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  function handleCreate() {
+    setSelectedTask(null);
+    setIsModalOpen(true);
+  }
+
+  function handleEdit(task: Task) {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  }
+
+  function handleClose() {
+    setIsModalOpen(false);
+    setSelectedTask(null);
+  }
 
   return (
     <main className="mx-auto max-w-3xl p-8">
@@ -29,19 +45,23 @@ export function TaskManager({
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleCreate}
           className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
         >
           + Nova tarefa
         </button>
       </div>
 
-      <TaskList initialTasks={initialTasks} />
+      <TaskList
+        initialTasks={initialTasks}
+        onEdit={handleEdit}
+      />
 
       <TaskModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={() => setIsModalOpen(false)}
+        task={selectedTask}
+        onClose={handleClose}
+        onSuccess={handleClose}
       />
     </main>
   );

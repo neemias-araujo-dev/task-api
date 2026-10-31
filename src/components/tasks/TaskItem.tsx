@@ -2,9 +2,10 @@ import type { Task } from "@/server/trpc/types/task";
 
 type TaskItemProps = {
   task: Task;
+  onEdit: (task: Task) => void;
 };
 
-export function TaskItem({ task }: TaskItemProps) {
+export function TaskItem({ task, onEdit }: TaskItemProps) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
       <h3 className="font-semibold text-gray-900">
@@ -21,6 +22,15 @@ export function TaskItem({ task }: TaskItemProps) {
         Criada em:{" "}
         {new Date(task.dataCriacao).toLocaleString("pt-BR")}
       </p>
+
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={() => onEdit(task)}
+          className="rounded-md border px-3 py-1.5 text-sm hover:bg-gray-100"
+        >
+          Editar
+        </button>
+      </div>
     </div>
   );
 }

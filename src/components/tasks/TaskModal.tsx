@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { Task } from "@/server/trpc/types/task";
 import { api } from "@/trpc/react";
 
 type TaskModalProps = {
   isOpen: boolean;
+  task: Task | null;
   onClose: () => void;
   onSuccess: () => void;
 };
 
 export function TaskModal({
   isOpen,
+  task,
   onClose,
   onSuccess,
 }: TaskModalProps) {
@@ -19,16 +22,34 @@ export function TaskModal({
 
   const utils = api.useUtils();
 
-  const createTask = api.task.create.useMutation({
+  const createMutation = api.task.create.useMutation({
     onSuccess: async () => {
       await utils.task.getAll.invalidate();
-
-      setTitulo("");
-      setDescricao("");
-
       onSuccess();
     },
   });
+
+  const updateMutation = api.task.update.useMutation({
+    onSuccess: async () => {
+      await utils.task.getAll.invalidate();
+      onSuccess();
+    },
+  });
+
+  const isEditing = task !== null;
+
+  const isPending =
+    createMutation.isPending || updateMutation.isPending;
+
+  const error =
+    createMutation.error || updateMutation.error;
+
+  useEffect(() => {
+    if (isOpen) {
+      setTitulo(task?.titulo ?? "");
+      setDescricao(task?.descricao ?? "");
+    }
+  }, [isOpen, task]);
 
   if (!isOpen) {
     return null;
@@ -37,7 +58,17 @@ export function TaskModal({
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    createTask.mutate({
+    if (isEditing && task) {
+      updateMutation.mutate({
+        id: task.id,
+        titulo,
+        descricao: descricao || undefined,
+      });
+
+      return;
+    }
+
+    createMutation.mutate({
       titulo,
       descricao: descricao || undefined,
     });
@@ -48,7 +79,7 @@ export function TaskModal({
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-bold">
-            Nova tarefa
+            {isEditing ? "Editar tarefa" : "Nova tarefa"}
           </h2>
 
           <button
@@ -98,9 +129,9 @@ export function TaskModal({
             />
           </div>
 
-          {createTask.error && (
+          {error && (
             <p className="text-sm text-red-600">
-              Erro ao criar tarefa: {createTask.error.message}
+              Erro: {error.message}
             </p>
           )}
 
@@ -115,10 +146,14 @@ export function TaskModal({
 
             <button
               type="submit"
-              disabled={createTask.isPending}
+              disabled={isPending}
               className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {createTask.isPending ? "Salvando..." : "Salvar tarefa"}
+              {isPending
+                ? "Salvando..."
+                : isEditing
+                  ? "Salvar alterações"
+                  : "Salvar tarefa"}
             </button>
           </div>
         </form>

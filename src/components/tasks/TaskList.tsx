@@ -6,9 +6,13 @@ import { TaskItem } from "./TaskItem";
 
 type TaskListProps = {
   initialTasks: Task[];
+  onEdit: (task: Task) => void;
 };
 
-export function TaskList({ initialTasks }: TaskListProps) {
+export function TaskList({
+  initialTasks,
+  onEdit,
+}: TaskListProps) {
   const { data: tasks, isLoading, error } =
     api.task.getAll.useQuery(undefined, {
       initialData: initialTasks,
@@ -43,7 +47,11 @@ export function TaskList({ initialTasks }: TaskListProps) {
   return (
     <div className="mt-6 space-y-4">
       {tasks.map((task) => (
-        <TaskItem key={task.id} task={task} />
+        <TaskItem
+          key={task.id}
+          task={task}
+          onEdit={onEdit}
+        />
       ))}
     </div>
   );
