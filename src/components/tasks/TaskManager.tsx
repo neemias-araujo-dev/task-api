@@ -24,6 +24,7 @@ export function TaskManager() {
       <TaskModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSuccess={() => setIsModalOpen(false)}
       />
     </main>
   );

@@ -1,16 +1,46 @@
 "use client";
 
+import { useState } from "react";
+import { api } from "@/trpc/react";
+
 type TaskModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 };
 
 export function TaskModal({
   isOpen,
   onClose,
+  onSuccess,
 }: TaskModalProps) {
+  const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
+
+  const utils = api.useUtils();
+
+  const createTask = api.task.create.useMutation({
+    onSuccess: async () => {
+      await utils.task.getAll.invalidate();
+
+      setTitulo("");
+      setDescricao("");
+
+      onSuccess();
+    },
+  });
+
   if (!isOpen) {
     return null;
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    createTask.mutate({
+      titulo,
+      descricao: descricao || undefined,
+    });
   }
 
   return (
@@ -30,7 +60,7 @@ export function TaskModal({
           </button>
         </div>
 
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="titulo"
@@ -41,9 +71,10 @@ export function TaskModal({
 
             <input
               id="titulo"
-              name="titulo"
               type="text"
               required
+              value={titulo}
+              onChange={(event) => setTitulo(event.target.value)}
               className="w-full rounded-md border p-2 outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Digite o título da tarefa"
             />
@@ -59,12 +90,19 @@ export function TaskModal({
 
             <textarea
               id="descricao"
-              name="descricao"
               rows={4}
+              value={descricao}
+              onChange={(event) => setDescricao(event.target.value)}
               className="w-full resize-none rounded-md border p-2 outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Descreva sua tarefa"
             />
           </div>
+
+          {createTask.error && (
+            <p className="text-sm text-red-600">
+              Erro ao criar tarefa: {createTask.error.message}
+            </p>
+          )}
 
           <div className="flex justify-end gap-3">
             <button
@@ -77,9 +115,10 @@ export function TaskModal({
 
             <button
               type="submit"
-              className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              disabled={createTask.isPending}
+              className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              Salvar tarefa
+              {createTask.isPending ? "Salvando..." : "Salvar tarefa"}
             </button>
           </div>
         </form>
