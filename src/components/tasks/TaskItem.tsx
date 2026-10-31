@@ -3,17 +3,23 @@ import type { Task } from "@/server/trpc/types/task";
 
 type TaskItemProps = {
   task: Task;
+  view: "list" | "grid";
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
 };
 
 export function TaskItem({
   task,
+  view,
   onEdit,
   onDelete,
 }: TaskItemProps) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <div
+      className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm ${
+        view === "list" ? "w-full" : "h-full"
+      }`}
+    >
       <h3 className="font-semibold text-gray-900">
         {task.titulo}
       </h3>
