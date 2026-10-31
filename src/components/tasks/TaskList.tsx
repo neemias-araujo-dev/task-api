@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Task } from "@/server/trpc/types/task";
@@ -7,16 +8,21 @@ import { TaskItem } from "./TaskItem";
 type TaskListProps = {
   initialTasks: Task[];
   onEdit: (task: Task) => void;
+  onDelete: (task: Task) => void;
 };
 
 export function TaskList({
   initialTasks,
   onEdit,
+  onDelete,
 }: TaskListProps) {
-  const { data: tasks, isLoading, error } =
-    api.task.getAll.useQuery(undefined, {
-      initialData: initialTasks,
-    });
+  const {
+    data: tasks,
+    isLoading,
+    error,
+  } = api.task.getAll.useQuery(undefined, {
+    initialData: initialTasks,
+  });
 
   if (isLoading) {
     return <p>Carregando tarefas...</p>;
@@ -51,6 +57,7 @@ export function TaskList({
           key={task.id}
           task={task}
           onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>
