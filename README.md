@@ -1,3 +1,11 @@
+## 🚀 Demonstração online
+
+A aplicação está disponível para acesso:
+
+🔗 **[Acessar Task Api - Gerenciador de Tarefas](https://task-api-bice-two.vercel.app/)**
+
+Você pode acessar a aplicação e testar as funcionalidades de gerenciamento de tarefas diretamente pelo navegador.
+
 # Task API - Gerenciador de Tarefas
 
 API e aplicação web para gerenciamento de tarefas, desenvolvidas utilizando **Next.js 15, TypeScript, tRPC, React Query e Zod**.
