@@ -3,5 +3,6 @@ import { serverCaller } from "@/server/trpc/server";
 
 
 export default async function Home() {
-  return <TaskManager />;
+  const initialTasks = await serverCaller.task.getAll();
+  return <TaskManager initialTasks={initialTasks} />;
 }

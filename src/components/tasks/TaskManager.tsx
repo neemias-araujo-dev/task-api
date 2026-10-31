@@ -1,17 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { TaskModal } from "./TaskModal";
+import type { Task } from "@/server/trpc/types/task";
 
-export function TaskManager() {
+import { TaskModal } from "./TaskModal";
+import { TaskList } from "./TaskList";
+
+type TaskManagerProps = {
+  initialTasks: Task[];
+};
+
+export function TaskManager({
+  initialTasks,
+}: TaskManagerProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <main className="p-8">
+    <main className="mx-auto max-w-3xl p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          Task Manager
-        </h1>
+        <div>
+          <h1 className="text-2xl font-bold">
+            Task Manager
+          </h1>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Organize suas tarefas.
+          </p>
+        </div>
 
         <button
           onClick={() => setIsModalOpen(true)}
@@ -20,6 +35,8 @@ export function TaskManager() {
           + Nova tarefa
         </button>
       </div>
+
+      <TaskList initialTasks={initialTasks} />
 
       <TaskModal
         isOpen={isModalOpen}
