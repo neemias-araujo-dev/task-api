@@ -1,3 +1,4 @@
+
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -6,13 +7,13 @@ import { router, publicProcedure } from "../trpc";
 import {
   createTask,
   getAllTasks,
+  getTaskCount,
+  getPaginatedTasks,
   updateTask,
   deleteTask,
 } from "../services/task.service";
 
 export const taskRouter = router({
-
- 
   create: publicProcedure
     .input(
       z.object({
@@ -24,12 +25,14 @@ export const taskRouter = router({
       return createTask(input.titulo, input.descricao);
     }),
 
-  
   getAll: publicProcedure.query(() => {
     return getAllTasks();
   }),
 
-  
+  getCount: publicProcedure.query(() => {
+    return getTaskCount();
+  }),
+
   update: publicProcedure
     .input(
       z.object({
@@ -53,7 +56,6 @@ export const taskRouter = router({
       }
     }),
 
-
   delete: publicProcedure
     .input(
       z.object({
@@ -71,4 +73,17 @@ export const taskRouter = router({
       }
     }),
 
+  getPaginated: publicProcedure
+    .input(
+      z.object({
+        cursor: z.number().int().min(0).default(0),
+        limit: z.number().int().min(1).max(50).default(5),
+      })
+    )
+    .query(({ input }) => {
+      return getPaginatedTasks(
+        input.cursor,
+        input.limit
+      );
+    }),
 });

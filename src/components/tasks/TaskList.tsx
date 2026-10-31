@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Task } from "@/server/trpc/types/task";
 import { api } from "@/trpc/react";
 import { TaskItem } from "./TaskItem";
@@ -12,6 +12,8 @@ type TaskListProps = {
   onDelete: (task: Task) => void;
 };
 
+const PAGE_SIZE = 5;
+
 export function TaskList({
   initialTasks,
   onEdit,
@@ -19,13 +21,50 @@ export function TaskList({
 }: TaskListProps) {
   const [view, setView] = useState<"list" | "grid">("list");
 
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   const {
-    data: tasks,
+    data,
     isLoading,
     error,
-  } = api.task.getAll.useQuery(undefined, {
-    initialData: initialTasks,
-  });
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = api.task.getPaginated.useInfiniteQuery(
+    {
+      limit: PAGE_SIZE,
+    },
+    {
+      initialCursor: 0,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    }
+  );
+
+  const tasks =
+    data?.pages.flatMap((page) => page.items) ?? initialTasks;
+
+  useEffect(() => {
+    const element = loadMoreRef.current;
+
+    if (!element || !hasNextPage) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return <p>Carregando tarefas...</p>;
@@ -43,7 +82,7 @@ export function TaskList({
     <div className="mt-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">
-          Minhas tarefas ({tasks?.length ?? 0})
+          Tarefas em tela ({tasks.length})
         </h2>
 
         <div className="flex gap-2">
@@ -71,7 +110,7 @@ export function TaskList({
         </div>
       </div>
 
-      {!tasks || tasks.length === 0 ? (
+      {tasks.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <p className="text-gray-500">
             Nenhuma tarefa cadastrada.
@@ -100,6 +139,23 @@ export function TaskList({
           ))}
         </div>
       )}
+
+      <div
+        ref={loadMoreRef}
+        className="mt-6 py-4 text-center"
+      >
+        {isFetchingNextPage && (
+          <p className="text-sm text-gray-500">
+            Carregando mais tarefas...
+          </p>
+        )}
+
+        {!hasNextPage && tasks.length > 0 && (
+          <p className="text-sm text-gray-400">
+            Você chegou ao final das tarefas.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import type { Task } from "@/server/trpc/types/task";
+import { api } from "@/trpc/react";
 
 import { TaskModal } from "./TaskModal";
 import { TaskList } from "./TaskList";
@@ -21,6 +22,11 @@ export function TaskManager({
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [feedback, setFeedback] = useState("");
 
+  const utils = api.useUtils();
+
+  const { data: taskCount, isLoading: isCountLoading } =
+    api.task.getCount.useQuery();
+
   function handleCreate() {
     setSelectedTask(null);
     setIsModalOpen(true);
@@ -38,12 +44,19 @@ export function TaskManager({
     setSelectedTask(null);
   }
 
+  function handleModalSuccess() {
+    void utils.task.getCount.invalidate();
+    handleClose();
+  }
+
   function handleDelete(task: Task) {
     setTaskToDelete(task);
     setFeedback("");
   }
 
   function handleDeleteSuccess() {
+    void utils.task.getCount.invalidate();
+
     setTaskToDelete(null);
     setFeedback("Tarefa excluída com sucesso.");
   }
@@ -58,6 +71,11 @@ export function TaskManager({
 
           <p className="mt-1 text-sm text-gray-500">
             Organize suas tarefas.
+          </p>
+
+          <p className="mt-2 text-sm font-medium text-gray-700">
+            Minhas tarefas:{" "}
+            {isCountLoading ? "..." : taskCount ?? 0}
           </p>
         </div>
 
@@ -95,7 +113,7 @@ export function TaskManager({
         isOpen={isModalOpen}
         task={selectedTask}
         onClose={handleClose}
-        onSuccess={handleClose}
+        onSuccess={handleModalSuccess}
       />
 
       <DeleteTaskDialog

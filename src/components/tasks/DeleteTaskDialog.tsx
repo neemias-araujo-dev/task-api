@@ -10,6 +10,8 @@ type DeleteTaskDialogProps = {
   onSuccess: () => void;
 };
 
+const PAGE_SIZE = 5;
+
 export function DeleteTaskDialog({
   task,
   onClose,
@@ -18,8 +20,27 @@ export function DeleteTaskDialog({
   const utils = api.useUtils();
 
   const deleteMutation = api.task.delete.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (deletedTask) => {
+      // Remove a tarefa da lista exibida, sem reiniciar a paginação
+      utils.task.getPaginated.setInfiniteData(
+        { limit: PAGE_SIZE },
+        (oldData) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              items: page.items.filter(
+                (item) => item.id !== deletedTask.id
+              ),
+            })),
+          };
+        }
+      );
+
       await utils.task.getAll.invalidate();
+
       onSuccess();
     },
   });
@@ -29,12 +50,12 @@ export function DeleteTaskDialog({
   }
 
   function handleDelete() {
-  if (!task) return;
+    if (!task) return;
 
-  deleteMutation.mutate({
-    id: task.id,
-  });
-}
+    deleteMutation.mutate({
+      id: task.id,
+    });
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

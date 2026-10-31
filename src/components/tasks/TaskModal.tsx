@@ -1,6 +1,8 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import type { Task } from "@/server/trpc/types/task";
 import { api } from "@/trpc/react";
 
@@ -10,6 +12,8 @@ type TaskModalProps = {
   onClose: () => void;
   onSuccess: () => void;
 };
+
+const PAGE_SIZE = 5;
 
 export function TaskModal({
   isOpen,
@@ -22,18 +26,31 @@ export function TaskModal({
 
   const utils = api.useUtils();
 
+  async function refreshTasks() {
+    const allTasks = await utils.task.getAll.fetch();
+
+    utils.task.getPaginated.setInfiniteData(
+      { limit: PAGE_SIZE },
+      {
+        pages: [
+          {
+            items: allTasks,
+            nextCursor: undefined,
+          },
+        ],
+        pageParams: [0],
+      }
+    );
+
+    onSuccess();
+  }
+
   const createMutation = api.task.create.useMutation({
-    onSuccess: async () => {
-      await utils.task.getAll.invalidate();
-      onSuccess();
-    },
+    onSuccess: refreshTasks,
   });
 
   const updateMutation = api.task.update.useMutation({
-    onSuccess: async () => {
-      await utils.task.getAll.invalidate();
-      onSuccess();
-    },
+    onSuccess: refreshTasks,
   });
 
   const isEditing = task !== null;
@@ -55,7 +72,7 @@ export function TaskModal({
     return null;
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (isEditing && task) {
