@@ -21,7 +21,6 @@ export function DeleteTaskDialog({
 
   const deleteMutation = api.task.delete.useMutation({
     onSuccess: async () => {
-      // Refaz as páginas carregadas para preencher lacunas e atualizar cursores.
       await utils.task.getPaginated.invalidate({
         limit: PAGE_SIZE,
       });

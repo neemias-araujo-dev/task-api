@@ -46,7 +46,6 @@ export function TaskList({
         pages: [initialPage],
         pageParams: [0],
       },
-      // Os dados vieram do SSR; mutations invalidam a consulta quando há mudanças.
       staleTime: 30_000,
     }
   );

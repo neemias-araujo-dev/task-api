@@ -1,7 +1,5 @@
-
 import { Task } from "../types/task";
 
-// Compartilha o armazenamento no processo Node.js
 const globalForTasks = globalThis as typeof globalThis & {
   taskManagerTasks?: Task[];
 };
@@ -10,7 +8,6 @@ const tasks =
   globalForTasks.taskManagerTasks ??
   (globalForTasks.taskManagerTasks = []);
 
-// Criar uma nova tarefa
 export function createTask(
   titulo: string,
   descricao?: string
@@ -27,12 +24,10 @@ export function createTask(
   return newTask;
 }
 
-// Listar todas as tarefas
 export function getAllTasks(): Task[] {
   return tasks;
 }
 
-// Listar tarefas com paginação
 export function getPaginatedTasks(
   cursor: number,
   limit: number
@@ -54,7 +49,6 @@ export function getTaskCount(): number {
   return tasks.length;
 }
 
-// Atualizar uma tarefa existente
 export function updateTask(
   id: string,
   titulo: string,
@@ -79,7 +73,6 @@ export function updateTask(
   return updatedTask;
 }
 
-// Deletar uma tarefa
 export function deleteTask(id: string): Task {
   const taskIndex = tasks.findIndex(
     (task) => task.id === id
