@@ -51,7 +51,7 @@ Os dados ficam em memória no processo Node.js e são apagados quando o processo
 
 ## Parte teórica
 
-As respostas às questões teóricas do case estão em [Respostas da Parte 1](docs/Respostas-Parte-1-Case-Produtividade.docx).
+As respostas às questões teóricas do case estão em [Respostas da Parte 1](docs/Respostas-Parte-1-Case-Produtividade.pdf).
 
 ## Demonstração
 
