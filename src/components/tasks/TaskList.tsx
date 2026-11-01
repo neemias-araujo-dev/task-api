@@ -116,7 +116,7 @@ export function TaskList({
           </button>
         </div>
       ) : (
-        <ul className="divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 bg-white">
+        <ul className="flex flex-col gap-3">
           {tasks.map((task) => (
             <li key={task.id}>
               <TaskItem

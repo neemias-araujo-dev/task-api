@@ -13,7 +13,7 @@ export function TaskItem({
   onDelete,
 }: TaskItemProps) {
   return (
-    <article className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+    <article className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
       <div className="min-w-0">
         <h3 className="break-words text-sm font-semibold leading-6 text-gray-900">
           {task.titulo}

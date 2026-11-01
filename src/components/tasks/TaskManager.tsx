@@ -72,7 +72,7 @@ export function TaskManager({
       <header className="flex flex-col gap-6 border-b border-gray-200 pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
-            Organize seu dia
+            Task API
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-950 sm:text-4xl">
             Minhas tarefas
@@ -86,7 +86,7 @@ export function TaskManager({
 
         <button
           onClick={handleCreate}
-          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gray-900 px-5 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-green-700 px-5 text-sm font-medium text-white transition-colors hover:bg-green-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
         >
           Nova tarefa
         </button>
