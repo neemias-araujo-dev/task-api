@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { Task } from "@/server/trpc/types/task";
 import { api } from "@/trpc/react";
 import { TaskItem } from "./TaskItem";
@@ -12,6 +12,7 @@ type InitialTaskPage = {
 
 type TaskListProps = {
   initialPage: InitialTaskPage;
+  onCreate: () => void;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
 };
@@ -20,11 +21,10 @@ const PAGE_SIZE = 5;
 
 export function TaskList({
   initialPage,
+  onCreate,
   onEdit,
   onDelete,
 }: TaskListProps) {
-  const [view, setView] = useState<"list" | "grid">("list");
-
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -77,82 +77,64 @@ export function TaskList({
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
-    return <p>Carregando tarefas...</p>;
+    return (
+      <p role="status" className="py-10 text-center text-sm text-gray-500">
+        Carregando tarefas...
+      </p>
+    );
   }
 
   if (error) {
     return (
-      <p className="text-red-600">
+      <p role="alert" className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
         Erro ao carregar tarefas: {error.message}
       </p>
     );
   }
 
   return (
-    <div className="mt-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">
-          Tarefas em tela ({tasks.length})
+    <section className="mt-8" aria-labelledby="task-list-heading">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 id="task-list-heading" className="text-base font-semibold text-gray-900">
+          Tarefas
         </h2>
-
-        <div className="flex gap-2">
-          <button
-            onClick={() => setView("list")}
-            className={`rounded-md border px-3 py-2 text-sm ${
-              view === "list"
-                ? "border-blue-600 bg-blue-600 text-white"
-                : "hover:bg-gray-100"
-            }`}
-          >
-            Lista
-          </button>
-
-          <button
-            onClick={() => setView("grid")}
-            className={`rounded-md border px-3 py-2 text-sm ${
-              view === "grid"
-                ? "border-blue-600 bg-blue-600 text-white"
-                : "hover:bg-gray-100"
-            }`}
-          >
-            Cards
-          </button>
-        </div>
       </div>
 
       {tasks.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-8 text-center">
-          <p className="text-gray-500">
-            Nenhuma tarefa cadastrada.
+        <div className="rounded-xl border border-dashed border-gray-300 bg-white/70 px-6 py-12 text-center">
+          <p className="text-base font-medium text-gray-900">
+            Sua lista está vazia
           </p>
 
-          <p className="mt-1 text-sm text-gray-400">
-            Clique em Nova tarefa para começar.
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-gray-600">
+            Crie uma tarefa para registrar o que você precisa fazer.
           </p>
+          <button
+            onClick={onCreate}
+            className="mt-5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+          >
+            Criar primeira tarefa
+          </button>
         </div>
       ) : (
-        <div
-          className={
-            view === "list"
-              ? "flex flex-col gap-4"
-              : "grid grid-cols-1 gap-4 md:grid-cols-2"
-          }
-        >
+        <ul className="divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 bg-white">
           {tasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              view={view}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
+            <li key={task.id}>
+              <TaskItem
+                task={task}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       <div
         ref={loadMoreRef}
-        className="mt-6 py-4 text-center"
+        className="mt-2 min-h-12 py-4 text-center"
+        role="status"
+        aria-live="polite"
       >
         {isFetchingNextPage && (
           <p className="text-sm text-gray-500">
@@ -161,11 +143,11 @@ export function TaskList({
         )}
 
         {!hasNextPage && tasks.length > 0 && (
-          <p className="text-sm text-gray-400">
+          <p className="text-xs text-gray-500">
             Você chegou ao final das tarefas.
           </p>
         )}
       </div>
-    </div>
+    </section>
   );
 }

@@ -95,27 +95,37 @@ export function TaskModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/35 p-4 backdrop-blur-[2px]">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="task-modal-title"
+        className="w-full max-w-lg rounded-xl border border-gray-200 bg-white p-5 shadow-2xl shadow-gray-950/15 sm:p-7"
+      >
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-gray-500">
+              Tarefas
+            </p>
+            <h2 id="task-modal-title" className="mt-1 text-xl font-semibold tracking-tight text-gray-950">
             {isEditing ? "Editar tarefa" : "Nova tarefa"}
-          </h2>
+            </h2>
+          </div>
 
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-800"
+            className="rounded-md px-2 py-1 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500"
             aria-label="Fechar modal"
           >
-            ✕
+            Fechar
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
               htmlFor="titulo"
-              className="mb-1 block text-sm font-medium"
+              className="mb-1.5 block text-sm font-medium text-gray-800"
             >
               Título
             </label>
@@ -124,12 +134,13 @@ export function TaskModal({
               id="titulo"
               type="text"
               required
+              autoFocus
               value={titulo}
               onChange={(event) => {
                 setTitulo(event.target.value);
                 setValidationError("");
               }}
-              className="w-full rounded-md border p-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-950 outline-none transition-shadow placeholder:text-gray-400 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
               placeholder="Digite o título da tarefa"
             />
           </div>
@@ -137,7 +148,7 @@ export function TaskModal({
           <div>
             <label
               htmlFor="descricao"
-              className="mb-1 block text-sm font-medium"
+              className="mb-1.5 block text-sm font-medium text-gray-800"
             >
               Descrição
             </label>
@@ -147,28 +158,28 @@ export function TaskModal({
               rows={4}
               value={descricao}
               onChange={(event) => setDescricao(event.target.value)}
-              className="w-full resize-none rounded-md border p-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full resize-y rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm leading-6 text-gray-950 outline-none transition-shadow placeholder:text-gray-400 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
               placeholder="Descreva sua tarefa"
             />
           </div>
 
           {validationError && (
-            <p className="text-sm text-red-600">
+            <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
               {validationError}
             </p>
           )}
 
           {error && (
-            <p className="text-sm text-red-600">
+            <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
               Erro: {error.message}
             </p>
           )}
 
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:justify-end sm:gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md border px-4 py-2 hover:bg-gray-100"
+              className="min-h-10 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500"
             >
               Cancelar
             </button>
@@ -176,7 +187,7 @@ export function TaskModal({
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="min-h-10 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
             >
               {isPending
                 ? "Salvando..."

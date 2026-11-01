@@ -68,49 +68,49 @@ export function TaskManager({
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-8">
-      <div className="flex items-center justify-between">
+    <main className="mx-auto min-h-screen max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
+      <header className="flex flex-col gap-6 border-b border-gray-200 pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">
-            Task Manager
-          </h1>
-
-          <p className="mt-1 text-sm text-gray-500">
-            Organize suas tarefas.
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+            Organize seu dia
           </p>
-
-          <p className="mt-2 text-sm font-medium text-gray-700">
-            Minhas tarefas:{" "}
-            {isCountLoading ? "..." : taskCount ?? 0}
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-950 sm:text-4xl">
+            Minhas tarefas
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            {isCountLoading
+              ? "Carregando tarefas..."
+              : `${taskCount ?? 0} ${taskCount === 1 ? "tarefa cadastrada" : "tarefas cadastradas"}`}
           </p>
         </div>
 
         <button
           onClick={handleCreate}
-          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-gray-900 px-5 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
         >
-          + Nova tarefa
+          Nova tarefa
         </button>
-      </div>
+      </header>
 
       {feedback && (
         <div
           role="status"
-          className="mt-4 rounded-md bg-green-100 p-3 text-sm text-green-800"
+          className="mt-5 flex items-center justify-between gap-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900"
         >
           {feedback}
 
           <button
             onClick={() => setFeedback("")}
-            className="ml-3 font-semibold"
+            className="shrink-0 rounded px-2 py-1 font-medium text-green-800 hover:bg-green-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-700"
           >
-            Fechar
+            Fechar mensagem
           </button>
         </div>
       )}
 
       <TaskList
         initialPage={initialPage}
+        onCreate={handleCreate}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
