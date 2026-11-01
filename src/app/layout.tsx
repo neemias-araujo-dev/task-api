@@ -3,8 +3,8 @@ import { TRPCProvider } from "@/trpc/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Task Manager",
-  description: "Task management application",
+  title: "Gerenciador de Tarefas",
+  description: "Aplicação de gerenciamento de tarefas",
 };
 
 export default function RootLayout({
