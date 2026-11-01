@@ -20,26 +20,11 @@ export function DeleteTaskDialog({
   const utils = api.useUtils();
 
   const deleteMutation = api.task.delete.useMutation({
-    onSuccess: async (deletedTask) => {
-      // Remove a tarefa da lista exibida, sem reiniciar a paginação
-      utils.task.getPaginated.setInfiniteData(
-        { limit: PAGE_SIZE },
-        (oldData) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              items: page.items.filter(
-                (item) => item.id !== deletedTask.id
-              ),
-            })),
-          };
-        }
-      );
-
-      await utils.task.getAll.invalidate();
+    onSuccess: async () => {
+      // Refaz as páginas carregadas para preencher lacunas e atualizar cursores.
+      await utils.task.getPaginated.invalidate({
+        limit: PAGE_SIZE,
+      });
 
       onSuccess();
     },

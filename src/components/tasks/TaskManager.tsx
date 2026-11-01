@@ -29,7 +29,9 @@ export function TaskManager({
   const utils = api.useUtils();
 
   const { data: taskCount, isLoading: isCountLoading } =
-    api.task.getCount.useQuery();
+    api.task.getCount.useQuery(undefined, {
+      staleTime: 30_000,
+    });
 
   function handleCreate() {
     setSelectedTask(null);
