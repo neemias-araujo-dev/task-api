@@ -70,7 +70,7 @@ export function TaskModal({
     const normalizedTitle = titulo.trim();
 
     if (!normalizedTitle) {
-      setValidationError("O título é obrigatório.");
+      setValidationError("Digite um título para a tarefa.");
       return;
     }
 
@@ -121,7 +121,7 @@ export function TaskModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form noValidate onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
               htmlFor="titulo"
@@ -133,8 +133,9 @@ export function TaskModal({
             <input
               id="titulo"
               type="text"
-              required
               autoFocus
+              aria-invalid={Boolean(validationError)}
+              aria-describedby={validationError ? "titulo-validation-error" : undefined}
               value={titulo}
               onChange={(event) => {
                 setTitulo(event.target.value);
@@ -143,6 +144,15 @@ export function TaskModal({
               className="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-950 outline-none transition-shadow placeholder:text-gray-400 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
               placeholder="Digite o título da tarefa"
             />
+            {validationError && (
+              <p
+                id="titulo-validation-error"
+                role="alert"
+                className="mt-2 text-sm text-red-700"
+              >
+                {validationError}
+              </p>
+            )}
           </div>
 
           <div>
@@ -163,15 +173,9 @@ export function TaskModal({
             />
           </div>
 
-          {validationError && (
-            <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
-              {validationError}
-            </p>
-          )}
-
           {error && (
             <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
-              Erro: {error.message}
+              {error.message}
             </p>
           )}
 

@@ -13,11 +13,16 @@ import {
   deleteTask,
 } from "../services/task.service";
 
+const taskTitleSchema = z
+  .string({ error: "O título precisa ser um texto." })
+  .trim()
+  .min(1, { error: "Digite um título para a tarefa." });
+
 export const taskRouter = router({
   create: publicProcedure
     .input(
       z.object({
-        titulo: z.string().trim().min(1, "Título é obrigatório"),
+        titulo: taskTitleSchema,
         descricao: z.string().optional(),
       })
     )
@@ -37,7 +42,7 @@ export const taskRouter = router({
     .input(
       z.object({
         id: z.string().uuid(),
-        titulo: z.string().trim().min(1, "Título é obrigatório"),
+        titulo: taskTitleSchema,
         descricao: z.string().optional(),
       })
     )
