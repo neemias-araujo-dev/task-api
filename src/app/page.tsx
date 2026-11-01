@@ -4,10 +4,13 @@ import { serverCaller } from "@/server/trpc/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
-  const tasks = await serverCaller.task.getAll();
+const PAGE_SIZE = 5;
 
-  return (
-    <TaskManager initialTasks={tasks} />
-  );
+export default async function Home() {
+  const initialPage = await serverCaller.task.getPaginated({
+    cursor: 0,
+    limit: PAGE_SIZE,
+  });
+
+  return <TaskManager initialPage={initialPage} />;
 }

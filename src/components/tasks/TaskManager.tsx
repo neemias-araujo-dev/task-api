@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -9,12 +8,17 @@ import { TaskModal } from "./TaskModal";
 import { TaskList } from "./TaskList";
 import { DeleteTaskDialog } from "./DeleteTaskDialog";
 
+type InitialTaskPage = {
+  items: Task[];
+  nextCursor?: number;
+};
+
 type TaskManagerProps = {
-  initialTasks: Task[];
+  initialPage: InitialTaskPage;
 };
 
 export function TaskManager({
-  initialTasks,
+  initialPage,
 }: TaskManagerProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -104,7 +108,7 @@ export function TaskManager({
       )}
 
       <TaskList
-        initialTasks={initialTasks}
+        initialPage={initialPage}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -23,24 +22,14 @@ export function TaskModal({
 }: TaskModalProps) {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   const utils = api.useUtils();
 
   async function refreshTasks() {
-    const allTasks = await utils.task.getAll.fetch();
-
-    utils.task.getPaginated.setInfiniteData(
-      { limit: PAGE_SIZE },
-      {
-        pages: [
-          {
-            items: allTasks,
-            nextCursor: undefined,
-          },
-        ],
-        pageParams: [0],
-      }
-    );
+    await utils.task.getPaginated.invalidate({
+      limit: PAGE_SIZE,
+    });
 
     onSuccess();
   }
@@ -65,6 +54,9 @@ export function TaskModal({
     if (isOpen) {
       setTitulo(task?.titulo ?? "");
       setDescricao(task?.descricao ?? "");
+      setValidationError("");
+      createMutation.reset();
+      updateMutation.reset();
     }
   }, [isOpen, task]);
 
@@ -75,19 +67,30 @@ export function TaskModal({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const normalizedTitle = titulo.trim();
+
+    if (!normalizedTitle) {
+      setValidationError("O título é obrigatório.");
+      return;
+    }
+
+    setValidationError("");
+
+    const normalizedDescription = descricao.trim();
+
     if (isEditing && task) {
       updateMutation.mutate({
         id: task.id,
-        titulo,
-        descricao: descricao || undefined,
+        titulo: normalizedTitle,
+        descricao: normalizedDescription || undefined,
       });
 
       return;
     }
 
     createMutation.mutate({
-      titulo,
-      descricao: descricao || undefined,
+      titulo: normalizedTitle,
+      descricao: normalizedDescription || undefined,
     });
   }
 
@@ -122,7 +125,10 @@ export function TaskModal({
               type="text"
               required
               value={titulo}
-              onChange={(event) => setTitulo(event.target.value)}
+              onChange={(event) => {
+                setTitulo(event.target.value);
+                setValidationError("");
+              }}
               className="w-full rounded-md border p-2 outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Digite o título da tarefa"
             />
@@ -145,6 +151,12 @@ export function TaskModal({
               placeholder="Descreva sua tarefa"
             />
           </div>
+
+          {validationError && (
+            <p className="text-sm text-red-600">
+              {validationError}
+            </p>
+          )}
 
           {error && (
             <p className="text-sm text-red-600">

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -6,8 +5,13 @@ import type { Task } from "@/server/trpc/types/task";
 import { api } from "@/trpc/react";
 import { TaskItem } from "./TaskItem";
 
+type InitialTaskPage = {
+  items: Task[];
+  nextCursor?: number;
+};
+
 type TaskListProps = {
-  initialTasks: Task[];
+  initialPage: InitialTaskPage;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
 };
@@ -15,7 +19,7 @@ type TaskListProps = {
 const PAGE_SIZE = 5;
 
 export function TaskList({
-  initialTasks,
+  initialPage,
   onEdit,
   onDelete,
 }: TaskListProps) {
@@ -37,11 +41,15 @@ export function TaskList({
     {
       initialCursor: 0,
       getNextPageParam: (lastPage) => lastPage.nextCursor,
+
+      initialData: {
+        pages: [initialPage],
+        pageParams: [0],
+      },
     }
   );
 
-  const tasks =
-    data?.pages.flatMap((page) => page.items) ?? initialTasks;
+  const tasks = data.pages.flatMap((page) => page.items);
 
   useEffect(() => {
     const element = loadMoreRef.current;
@@ -53,7 +61,7 @@ export function TaskList({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isFetchingNextPage) {
-          fetchNextPage();
+          void fetchNextPage();
         }
       },
       {
